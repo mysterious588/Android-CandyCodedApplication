@@ -14,13 +14,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.pluralsight.candycoded.DB.CandyContract.CandyEntry;
+import com.pluralsight.candycoded.DB.CandyCursorAdapter;
+import com.pluralsight.candycoded.DB.CandyDbHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
-import com.pluralsight.candycoded.DB.CandyContract.CandyEntry;
-import com.pluralsight.candycoded.DB.CandyCursorAdapter;
-import com.pluralsight.candycoded.DB.CandyDbHelper;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
 
         final CandyCursorAdapter adapter = new CandyCursorAdapter(this, cursor);
-        ListView listView = (ListView) this.findViewById(R.id.list_view_candy);
+        ListView listView = (ListView)this.findViewById(R.id.list_view_candy);
 
         listView.setAdapter(adapter);
 
@@ -52,26 +52,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("https://vast-brushlands-23089.herokuapp.com/main/api", new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
-                Log.e("AsyncHttpClient", "response = " + response);
-            }
+        client.get("https://vast-brushlands-23089.herokuapp.com/main/api",
+                new TextHttpResponseHandler() {
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
+                        Log.e("AsyncHttpClient", "response = " + response);
+                    }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String response) {
-                Log.d("AsyncHttpClient", "response = " + response);
-                Gson gson = new GsonBuilder().create();
-                ;
-                candies = gson.fromJson(response, Candy[].class);
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String response) {
+                        Log.d("AsyncHttpClient", "response = " + response);
+                        Gson gson = new GsonBuilder().create();;
+                        candies = gson.fromJson(response, Candy[].class);
 
-                addCandiesToDatabase(candies);
+                        addCandiesToDatabase(candies);
 
-                SQLiteDatabase db = candyDbHelper.getWritableDatabase();
-                Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
-                //adapter.changeCursor(cursor);
-            }
-        });
+                        SQLiteDatabase db = candyDbHelper.getWritableDatabase();
+                        Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
+                        //adapter.changeCursor(cursor);
+                    }
+                });
     }
 
     @Override
@@ -83,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
     // ***
     // TODO - Task 1 - Show Store Information Activity
     // ***
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent infoIntent = new Intent(this, InfoActivity.class);
+        startActivity(infoIntent);
+        return super.onOptionsItemSelected(item);
+    }
 
     private void addCandiesToDatabase(Candy[] candies) {
         SQLiteDatabase db = candyDbHelper.getWritableDatabase();
@@ -98,10 +104,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent infoIntent = new Intent(this, InfoActivity.class);
-        startActivity(infoIntent);
-        return super.onOptionsItemSelected(item);
-    }
 }
